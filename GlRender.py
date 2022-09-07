@@ -162,7 +162,8 @@ class Raytracer(object):
                 p_y = ((y + 0.5 - self.vp_y) / self.vp_height) * 2 - 1
                 
                 # Proyeccion
-                t = tan((x + 0.5 - self.vp_x) / self.vp_width) * 2 - 1
+                # t = tan((self.fov * np.pi / 180) / 2) * self.near_plane # ! Velar por esas dos cosas "fov" y "near_plane"
+                t = tan((x + 0.5 - self.vp_x) / self.vp_width) * 2 - 1 # ! Revisar porque no estoy agarrando foc
                 r = t * self.vp_width / self.vp_height
                 
                 p_x *= r
