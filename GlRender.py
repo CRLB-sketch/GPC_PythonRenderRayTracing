@@ -162,15 +162,13 @@ class Raytracer(object):
                 p_y = ((y + 0.5 - self.vp_y) / self.vp_height) * 2 - 1
                 
                 # Proyeccion
-                # t = tan((self.fov * np.pi / 180) / 2) * self.near_plane # ! Velar por esas dos cosas "fov" y "near_plane"
-                t = tan((x + 0.5 - self.vp_x) / self.vp_width) * 2 - 1 # ! Revisar porque no estoy agarrando foc
+                t = tan((self.fov * 3.14159265358979323 / 180) / 2) * self.near_plane
                 r = t * self.vp_width / self.vp_height
                 
                 p_x *= r
                 p_y *= t
                 
                 direction = V3(p_x, p_y, -self.near_plane)
-                # direction = V3(p_x, p_y, mf.inverse_values_of_array_or_list(self.near_plane))
                 temp_list_direction = [direction.x, direction.y, direction.z]
                 direction = mf.divition(temp_list_direction, mf.norm(temp_list_direction))
                 
