@@ -21,7 +21,7 @@ rtx.env_map = Texture("textures/parkingLot.bmp")
 
 rtx.lights.append( AmbientLight(intensity = 0.1 ))
 rtx.lights.append( DirectionalLight(direction = (-1,-1,-1), intensity = 0.8 ))
-#rtx.lights.append( PointLight(point = (0,0,0)))
+# rtx.lights.append( PointLight(point = (0,0,0)))
 
 rtx.scene.append( Sphere(V3(0,0,-10), 1, mirror)  )
 
@@ -31,7 +31,6 @@ rtx.scene.append( Sphere(V3(0,3,-10), 1, stone)  )
 rtx.scene.append( Sphere(V3(-3,0,-10),1, blueMirror)  )
 rtx.scene.append( Sphere(V3(0,-3,-10), 1, yellowMirror)  )
 
-
 rtx.gl_render()
 
-rtx.gl_finish("outputs/example_sucess1.bmp")
+rtx.gl_finish("outputs/example_sucess.bmp")
