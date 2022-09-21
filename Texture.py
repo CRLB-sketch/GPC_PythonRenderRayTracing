@@ -13,6 +13,10 @@ __status__ = "Student of Computer Science"
 
 import struct
 
+from MathFake import MathFake as mf
+from math import atan2 as arctan2
+from math import acos as arccos
+
 class Texture(object):
     def __init__(self, filename):
         with open(filename, "rb") as image:
@@ -40,8 +44,15 @@ class Texture(object):
 
     def get_color(self, u, v):
         if 0 <= u < 1 and 0 <= v < 1:
-            return self.pixels[int(v * self.height)][int(u * self.width)]
-        
+            return self.pixels[int(v * self.height)][int(u * self.width)]     
         return None
+    
+    def get_env_color(self, dir):
+        dir = mf.divition(dir, mf.norm(dir))
+        
+        x = int((arctan2(dir[2], dir[0]) / (2 * mf.pi()) + 0.5) * self.width)
+        y = int(arccos(-dir[1]) / mf.pi() * self.height)
+        
+        return self.pixels[y][x]
 
 # Referencias de Carlos Alonso proporcionado en clase

@@ -18,10 +18,10 @@ class Intersect(object):
         self.scene_obj = scene_obj
 
 class Material(object):
-    def __init__(self, diffuse = WHITE, spec = 1.0, matType = OPAQUE):
+    def __init__(self, diffuse = WHITE, spec = 1.0, mat_type = OPAQUE):
         self.diffuse = diffuse
         self.spec = spec
-        self.matType = matType
+        self.mat_type = mat_type
 
 class Sphere(object):
     def __init__(self, center, radius, material):

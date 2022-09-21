@@ -19,6 +19,8 @@ from turtle import width
 
 from Obj import Obj
 from Texture import Texture
+from Figures import *
+from Lights import *
 
 from MathFake import MathFake as mf
 
@@ -110,7 +112,7 @@ class Raytracer(object):
         return intersect
     
     def cast_ray(self, origin, dir, scene_obj = None, recursion = 0) -> list:
-        intersect = self.scene_intersect(origin, dir, None)
+        intersect = self.scene_intersect(origin, dir, scene_obj)
         
         if intersect == None or recursion >= MAX_RECURSION_DEPTH:
             return self.env_map.get_env_color(dir) if self.env_map else (self.clear_color[0] / 255, self.clear_color[1] / 255, self.clear_color[2] / 255)           
@@ -119,43 +121,28 @@ class Raytracer(object):
         
         final_color = [0, 0, 0]
         object_color = [material.diffuse[0], material.diffuse[1], material.diffuse[2]]
-        
-        # dir_light_color = [0, 0, 0]
-        # amb_light_color = [0, 0, 0]
-                
-        # for light in self.lights:
-        #     if light.light_type == 0:
-        #         diffuse_color = [0, 0, 0]
-                
-        #         light_dir = mf.multiply_matrix_by_a_value(light.direction, -1)
-        #         intensity = mf.dot(intersect.normal, light_dir)
-        #         intensity = float(max(0, intensity))
-                
-        #         diffuse_color = [
-        #             intensity * light.color[0] * light.intensity,
-        #             intensity * light.color[1] * light.intensity,
-        #             intensity * light.color[2] * light.intensity,
-        #         ]
-                
-        #         # Sombras
-        #         shadow_intensity = 0
-        #         shadow_intersect = self.scene_intersect(intersect.point, light_dir, intersect.scene_obj)
-        #         if shadow_intersect:
-        #             shadow_intensity = 1
-                    
-        #         value_multi_diffuse_by_shadow = mf.multiply_matrix_by_a_value(diffuse_color, (1 - shadow_intensity))
-        #         dir_light_color = mf.add(dir_light_color, value_multi_diffuse_by_shadow)
-                
-        #     elif light.light_type == 2:
-        #         amb_light_color = mf.multiply_matrix_by_a_value(light.color, light.intensity)
-                
-        # final_color = mf.add(dir_light_color, amb_light_color)
-        
-        # final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
-        
-        if material.matType == OPAQUE:
+                            
+        if material.mat_type == OPAQUE:
             for light in self.lights:
                 diffuse_color = light.get_diffuse_color(intersect, self)
+                spec_color = light.get_spec_color(intersect, self)
+                shadow_intensity = light.get_shadow_intensity(intersect, self)
+
+                light_color = (diffuse_color + spec_color) * (1 - shadow_intensity)
+
+                final_color = mf.add(final_color, light_color)
+
+        elif material.mat_type == REFLECTIVE:
+            reflect = reflectVector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))
+            reflect_color = self.cast_ray(intersect.point, reflect, intersect.scene_obj, recursion + 1)
+
+            spec_color = [0,0,0]
+            for light in self.lights:
+                spec_color = mf.add(spec_color, light.get_spec_color(intersect, self))
+
+            final_color = mf.add(reflect_color, spec_color)
+
+        final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
 
         r = min(1, final_color[0])
         g = min(1, final_color[1])
@@ -171,7 +158,7 @@ class Raytracer(object):
                 p_y = ((y + 0.5 - self.vp_y) / self.vp_height) * 2 - 1
                 
                 # Proyeccion
-                t = tan((self.fov * 3.14159265358979323 / 180) / 2) * self.near_plane
+                t = tan((self.fov * mf.pi() / 180) / 2) * self.near_plane
                 r = t * self.vp_width / self.vp_height
                 
                 p_x *= r

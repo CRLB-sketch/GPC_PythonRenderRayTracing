@@ -30,11 +30,17 @@ class MathFake:
         return [[1 if x == y else 0 for y in range(0, size)] for x in range(0, size)]
     
     """
-    
+    Multiply Two Lists/Arrays:
+        Al ingresar dos listas/arrays del mismo tamaño se multiplicarán
+    Params:
+        array1 - list: Array/Lista numero 1 a multiplicar
+        array2 - list: Array/Lista numero 2 a multiplicar
+    Returns:
+        list/array: Retorna la nueva lista/array multiplicada
     """
     @staticmethod
     def multiply_two_lists_or_arrays(array1 : list, array2 : list):
-        if len(array1) != len(array2): return None
+        # if len(array1) != len(array2): return None
         return [(array1[i] * array2[i]) for i in range(len(array1))]
     
     """ 
@@ -65,13 +71,7 @@ class MathFake:
                     result[x][y] = float(res)
             if (m + 2) == len(all_matrixs): break            
         return result
-    
-    """
-    
-    """
-    def multiply_m3x3_and_m3x1(matrix_a : list, list_b : list) -> list:
-        return [(matrix_a[i][0] * list_b[0]) + (matrix_a[i][1] * list_b[1]) + (matrix_a[i][2] * list_b[2]) for i in range(len(matrix_a))]
-    
+        
     """ 
     Multiply Matrix And V4 / Multiplicar Matriz y V4:
         Se verifica si la matriz es 4 x 4
@@ -100,16 +100,18 @@ class MathFake:
             result[x] = res
         
         return result
-
+    
+    @staticmethod
+    def multiply_m3x3_and_m3x1(matrix_a : list, list_b : list) -> list:
+        return [(matrix_a[i][0] * list_b[0]) + (matrix_a[i][1] * list_b[1]) + (matrix_a[i][2] * list_b[2]) for i in range(len(matrix_a))]
+    
     @staticmethod
     def multiply_matrix_by_a_value(matrix_or_list : list, the_value : float):
         return [(i * the_value) for i in matrix_or_list]
     
     @staticmethod
     def add(matrix_list1 : list, matrix_list2 : list):
-        if len(matrix_list1) != len(matrix_list2):
-            return None
-                
+        # if len(matrix_list1) != len(matrix_list2): return None                
         return [(matrix_list1[i] + matrix_list2[i]) for i in range(len(matrix_list1))]
 
     """
@@ -155,6 +157,18 @@ class MathFake:
         j = ((a[0] * b[2]) - (a[2] * b[0]))
         k = ((a[0] * b[1]) - (a[1] * b[0]))
         return [i, -j, k]
+            
+    """
+    Subtract V3 / Resta de Vectores V3:
+        Se restarán dos arrays
+    Params:
+        a & b: Los arrays a operar
+    Return:
+        list: Resultado de la resta
+    """    
+    @staticmethod
+    def subtract_arrays(a : list, b : list) -> list:        
+        return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
     
     """
     Subtract V3 / Resta de Vectores V3:
@@ -232,3 +246,11 @@ class MathFake:
                 
         return [[matrix[i][j] for j in range(size, len(matrix[0]))] for i in range(size)]
     
+    """
+    Pi:
+        Número de Pi más aproximado
+    Return:
+        float : Número Pi
+    """
+    @staticmethod
+    def pi() -> float: return 3.14159265358979323
