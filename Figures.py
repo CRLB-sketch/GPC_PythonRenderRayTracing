@@ -6,6 +6,10 @@ V3 = namedtuple('Point3', ['x', 'y', 'z'])
 WHITE = (1, 1, 1)
 BLACK = (0, 0, 0)
 
+OPAQUE = 0
+REFLECTIVE = 1
+TRANSPARENT = 2
+
 class Intersect(object):
     def __init__(self, distance, point, normal, scene_obj):
         self.distance = distance
@@ -14,8 +18,10 @@ class Intersect(object):
         self.scene_obj = scene_obj
 
 class Material(object):
-    def __init__(self, diffuse = WHITE):
+    def __init__(self, diffuse = WHITE, spec = 1.0, matType = OPAQUE):
         self.diffuse = diffuse
+        self.spec = spec
+        self.matType = matType
 
 class Sphere(object):
     def __init__(self, center, radius, material):

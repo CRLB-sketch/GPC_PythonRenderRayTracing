@@ -22,6 +22,9 @@ from Texture import Texture
 
 from MathFake import MathFake as mf
 
+STEPS = 1
+MAX_RECURSION_DEPTH = 3
+
 V2 = namedtuple('Point2', ['x', 'y'])
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
 V4 = namedtuple('Point4', ['x', 'y', 'z', 'w'])
@@ -59,8 +62,10 @@ class Raytracer(object):
         self.cam_position = V3(0, 0, 0)                
         
         self.scene = []
-        self.lights = []                
-        
+        self.lights = []           
+
+        self.env_map = None
+             
         self.gl_clear()             
 
     def __gl_create_window(self, width : int, height : int) -> None:
@@ -104,50 +109,54 @@ class Raytracer(object):
                     
         return intersect
     
-    def cast_ray(self, origin, dir) -> list:
+    def cast_ray(self, origin, dir, scene_obj = None, recursion = 0) -> list:
         intersect = self.scene_intersect(origin, dir, None)
         
-        if intersect == None:
-            return None
+        if intersect == None or recursion >= MAX_RECURSION_DEPTH:
+            return self.env_map.get_env_color(dir) if self.env_map else (self.clear_color[0] / 255, self.clear_color[1] / 255, self.clear_color[2] / 255)           
         
         material = intersect.scene_obj.material
         
         final_color = [0, 0, 0]
         object_color = [material.diffuse[0], material.diffuse[1], material.diffuse[2]]
         
-        dir_light_color = [0, 0, 0]
-        amb_light_color = [0, 0, 0]
-        
-        for light in self.lights:
-            if light.light_type == 0:
-                diffuse_color = [0, 0, 0]
+        # dir_light_color = [0, 0, 0]
+        # amb_light_color = [0, 0, 0]
                 
-                light_dir = mf.multiply_matrix_by_a_value(light.direction, -1)
-                intensity = mf.dot(intersect.normal, light_dir)
-                intensity = float(max(0, intensity))
+        # for light in self.lights:
+        #     if light.light_type == 0:
+        #         diffuse_color = [0, 0, 0]
                 
-                diffuse_color = [
-                    intensity * light.color[0] * light.intensity,
-                    intensity * light.color[1] * light.intensity,
-                    intensity * light.color[2] * light.intensity,
-                ]
+        #         light_dir = mf.multiply_matrix_by_a_value(light.direction, -1)
+        #         intensity = mf.dot(intersect.normal, light_dir)
+        #         intensity = float(max(0, intensity))
                 
-                # Sombras
-                shadow_intensity = 0
-                shadow_intersect = self.scene_intersect(intersect.point, light_dir, intersect.scene_obj)
-                if shadow_intersect:
-                    shadow_intensity = 1
+        #         diffuse_color = [
+        #             intensity * light.color[0] * light.intensity,
+        #             intensity * light.color[1] * light.intensity,
+        #             intensity * light.color[2] * light.intensity,
+        #         ]
+                
+        #         # Sombras
+        #         shadow_intensity = 0
+        #         shadow_intersect = self.scene_intersect(intersect.point, light_dir, intersect.scene_obj)
+        #         if shadow_intersect:
+        #             shadow_intensity = 1
                     
-                value_multi_diffuse_by_shadow = mf.multiply_matrix_by_a_value(diffuse_color, (1 - shadow_intensity))
-                dir_light_color = mf.add(dir_light_color, value_multi_diffuse_by_shadow)
+        #         value_multi_diffuse_by_shadow = mf.multiply_matrix_by_a_value(diffuse_color, (1 - shadow_intensity))
+        #         dir_light_color = mf.add(dir_light_color, value_multi_diffuse_by_shadow)
                 
-            elif light.light_type == 2:
-                amb_light_color = mf.multiply_matrix_by_a_value(light.color, light.intensity)
+        #     elif light.light_type == 2:
+        #         amb_light_color = mf.multiply_matrix_by_a_value(light.color, light.intensity)
                 
-        final_color = mf.add(dir_light_color, amb_light_color)
+        # final_color = mf.add(dir_light_color, amb_light_color)
         
-        final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
+        # final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
         
+        if material.matType == OPAQUE:
+            for light in self.lights:
+                diffuse_color = light.get_diffuse_color(intersect, self)
+
         r = min(1, final_color[0])
         g = min(1, final_color[1])
         b = min(1, final_color[2])
