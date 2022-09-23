@@ -15,7 +15,49 @@ def reflectVector(normal, direction):
     return reflect
 
 def refractVector(normal, direction, ior):
-    pass
+    # Snell's Law
+    cosi = max(-1, min(1, mf.dot(direction, normal)))
+    etai = 1
+    etat = ior
+
+    if cosi < 0:
+        cosi = -cosi
+    else:
+        etai, etat = etat, etai
+        normal = mf.multiply_matrix_by_a_value(normal, -1)
+
+    eta = etai / etat
+    k = 1 - (eta**2) * (1 - (cosi**2))
+
+    if k < 0: # Total Internal Reflection
+        return None
+
+    r = mf.add(mf.multiply_matrix_by_a_value(direction, eta), mf.multiply_matrix_by_a_value(normal, (eta * cosi - k**0.5)))
+    # r = eta * direction + (eta * cosi - k**0.5) * normal
+    return r
+
+    
+def fresnel(normal, direction, ior):
+    # Fresnel Equation
+    cosi = max(-1, min(1, mf.dot(direction, normal)))
+    etai = 1
+    etat = ior
+
+    if cosi > 0:
+        etai, etat = etat, etai
+
+    sint = etai / etat * (max(0, 1 - cosi**2) ** 0.5)
+
+    if sint >= 1: # Total Internal
+        return 1
+    
+    cost = max(0, 1 - sint**2) ** 0.5
+    cosi = abs(cosi)
+
+    rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost))
+    rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost))
+
+    return (rs**2 + rp**2) / 2
 
 # ! Cuando haga funcionar todo esto voy a crear una "clase padre/interface" "LIGHT"
 class DirectionalLight(object):

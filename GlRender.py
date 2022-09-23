@@ -142,7 +142,35 @@ class Raytracer(object):
 
             final_color = mf.add(reflect_color, spec_color)
 
+        elif material.mat_type == TRANSPARENT:
+            # outside = np.dot(dir, intersect.normal) *signo menor* 0 # Explicacion min 50
+            outside = mf.dot(dir, intersect.normal)
+            bias = mf.multiply_matrix_by_a_value(intersect.normal, 0.001)
+
+            spec_color = [0, 0, 0]
+            for light in self.lights:
+                spec_color = mf.add(spec_color, light.get_spec_color(intersect, self))
+
+            reflect = reflectVector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))            
+            reflect_orig = mf.add(intersect.point, bias) if outside else mf.subtract_arrays(intersect.point, bias)            
+            reflect_color = self.cast_ray(reflect_orig, reflect, None, recursion + 1)
+            
+            kr = fresnel(intersect.normal, dir, material.ior)
+            
+            refract_color = [0, 0, 0]
+            if kr < 1:
+                refract = refractVector(intersect.normal, dir, material.ior)
+                refract_origin = mf.subtract_arrays(intersect.point, bias) if outside else mf.add(intersect.point, bias)            
+                refract_color = self.cast_ray(refract_origin, refract, None, recursion + 1)
+                
+            colors_res = mf.add(mf.multiply_matrix_by_a_value(reflect_color, kr), mf.multiply_matrix_by_a_value(refract_color, (1 - kr)))
+            final_color = mf.add(colors_res, spec_color)
+
         final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
+
+        # if material.texture and intersect.texcoords:
+        #     tex_color = material.texture.get_color(intersect.texcoords[0], intersect.texcoords[1])
+        #     final_color = mf.multi
 
         r = min(1, final_color[0])
         g = min(1, final_color[1])
@@ -195,3 +223,4 @@ class Raytracer(object):
             for y in range(self.height):
                 for x in range(self.width):                
                     file.write(self.pixels[x][y])
+                    

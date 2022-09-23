@@ -1,4 +1,8 @@
+from re import U
 from MathFake import MathFake as mf
+
+from math import atan2 as arctan2
+from math import acos as arccos
 
 from collections import namedtuple
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
@@ -11,16 +15,18 @@ REFLECTIVE = 1
 TRANSPARENT = 2
 
 class Intersect(object):
-    def __init__(self, distance, point, normal, scene_obj):
+    def __init__(self, distance, point, normal, texcoords, scene_obj):
         self.distance = distance
         self.point = point
         self.normal = normal
+        self.texcoords = texcoords
         self.scene_obj = scene_obj
 
 class Material(object):
-    def __init__(self, diffuse = WHITE, spec = 1.0, mat_type = OPAQUE):
+    def __init__(self, diffuse = WHITE, spec = 1.0, ior = 1.0, mat_type = OPAQUE):
         self.diffuse = diffuse
         self.spec = spec
+        self.ior = ior
         self.mat_type = mat_type
 
 class Sphere(object):
@@ -52,7 +58,13 @@ class Sphere(object):
         normal = mf.subtract_V3(V3(P[0], P[1], P[2]), self.center)
         normal = mf.divition(normal, mf.norm(normal))        
 
+        u = arctan2(normal[2], normal[0]) / (2 * mf.pi()) + 0.5
+        v = arccos(-normal[1]) / mf.pi()
+
+        uvs = (u, v)
+
         return Intersect(distance = t0,
                          point = P,
                          normal = normal,
+                         texcoords = uvs,
                          scene_obj = self)
