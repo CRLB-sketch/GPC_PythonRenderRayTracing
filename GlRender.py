@@ -128,8 +128,7 @@ class Raytracer(object):
                 spec_color = light.get_spec_color(intersect, self)
                 shadow_intensity = light.get_shadow_intensity(intersect, self)
 
-                light_color = (diffuse_color + spec_color) * (1 - shadow_intensity)
-
+                light_color = mf.multiply_matrix_by_a_value(mf.add(diffuse_color, spec_color), (1 - shadow_intensity))
                 final_color = mf.add(final_color, light_color)
 
         elif material.mat_type == REFLECTIVE:
@@ -143,8 +142,7 @@ class Raytracer(object):
             final_color = mf.add(reflect_color, spec_color)
 
         elif material.mat_type == TRANSPARENT:
-            # outside = np.dot(dir, intersect.normal) *signo menor* 0 # Explicacion min 50
-            outside = mf.dot(dir, intersect.normal)
+            outside = mf.dot(dir, intersect.normal) < 0
             bias = mf.multiply_matrix_by_a_value(intersect.normal, 0.001)
 
             spec_color = [0, 0, 0]
@@ -168,9 +166,9 @@ class Raytracer(object):
 
         final_color = mf.multiply_two_lists_or_arrays(final_color, object_color)
 
-        # if material.texture and intersect.texcoords:
-        #     tex_color = material.texture.get_color(intersect.texcoords[0], intersect.texcoords[1])
-        #     final_color = mf.multi
+        if material.texture and intersect.texcoords:
+            tex_color = material.texture.get_color(intersect.texcoords[0], intersect.texcoords[1])
+            final_color = mf.multiply_two_lists_or_arrays(final_color, tex_color) # ! Probablemente habrá un error ahí
 
         r = min(1, final_color[0])
         g = min(1, final_color[1])

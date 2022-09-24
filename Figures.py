@@ -23,10 +23,11 @@ class Intersect(object):
         self.scene_obj = scene_obj
 
 class Material(object):
-    def __init__(self, diffuse = WHITE, spec = 1.0, ior = 1.0, mat_type = OPAQUE):
+    def __init__(self, diffuse = WHITE, spec = 1.0, ior = 1.0, texture = None, mat_type = OPAQUE):
         self.diffuse = diffuse
         self.spec = spec
         self.ior = ior
+        self.texture = texture
         self.mat_type = mat_type
 
 class Sphere(object):
@@ -58,7 +59,7 @@ class Sphere(object):
         normal = mf.subtract_V3(V3(P[0], P[1], P[2]), self.center)
         normal = mf.divition(normal, mf.norm(normal))        
 
-        u = arctan2(normal[2], normal[0]) / (2 * mf.pi()) + 0.5
+        u = 1 - ((arctan2(normal[2], normal[0]) / (2 * mf.pi())) + 0.5)
         v = arccos(-normal[1]) / mf.pi()
 
         uvs = (u, v)
