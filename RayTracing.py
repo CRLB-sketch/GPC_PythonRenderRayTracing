@@ -21,7 +21,11 @@ rtx.lights.append( DirectionalLight(direction= (-1, -1, -1), intensity= 0.8))
 # rtx.scene.append( Plane(position=(0, -10, 0), normal = (0, 1, 0), brick))
 # rtx.scene.append( Plane(position=(0, -10, 0), normal=(0, 1, 0), material=brick))
 
-rtx.scene.append( AABB(position=(-3, -3, -10), size=(2, 2, 2), material= brick))
+rtx.scene.append( AABB(position=(2, 2, -10), size=(2, 2, 2), material= brick))
+rtx.scene.append( AABB(position=(-2, 2, -10), size=(2, 2, 2), material= stone))
+
+rtx.scene.append( AABB(position=(2, -2, -10), size=(2, 2, 2), material= mirror))
+rtx.scene.append( AABB(position=(-2, -2, -10), size=(2, 2, 2), material= glass))
 
 rtx.gl_render()
 

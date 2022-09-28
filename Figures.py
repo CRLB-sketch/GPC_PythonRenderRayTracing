@@ -168,7 +168,7 @@ class AABB(object):
         t = float('inf')
 
         for plane in self.planes:
-            plane_inter = plane.ray_intersect([orig.x, orig.y, orig.z], dir)
+            plane_inter = plane.ray_intersect([orig.x, orig.y, orig.z], dist)
             if plane_inter is not None:
                 plane_point = plane_inter.point
 
