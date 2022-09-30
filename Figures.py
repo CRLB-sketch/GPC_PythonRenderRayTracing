@@ -111,9 +111,8 @@ class Disk(object):
 
         if intersect is None: return None
 
-        # contact_distance = intersect.point - self.plane.position
         contact = mf.subtract_arrays(intersect.point, self.plane.position)
-        concact = mf.norm(contact)
+        contact = mf.norm(contact) # Acá saca la magnitud del contact
 
         if contact <= self.radius: return None
                 
