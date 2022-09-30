@@ -168,7 +168,9 @@ class Raytracer(object):
 
         if material.texture and intersect.texcoords:
             tex_color = material.texture.get_color(intersect.texcoords[0], intersect.texcoords[1])
-            final_color = mf.multiply_two_lists_or_arrays(final_color, tex_color) # ! Probablemente habrá un error ahí
+
+            if tex_color is not None:            
+                final_color = mf.multiply_two_lists_or_arrays(final_color, tex_color) # ! Probablemente habrá un error ahí
 
         r = min(1, final_color[0])
         g = min(1, final_color[1])

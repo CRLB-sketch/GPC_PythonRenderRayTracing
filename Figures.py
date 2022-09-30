@@ -99,6 +99,26 @@ class Plane(object):
 
         return None # No habrá contacto
 
+class Disk(object):
+
+    def __init__(self, position, normal, material, radius) -> None:
+        self.plane = Plane(position, normal , material)
+        self.material = material
+        self.radius = radius
+
+    def ray_intersect(self, orig, dir):
+        intersect = self.plane.ray_intersect(orig, dir)
+
+        if intersect is None: return None
+
+        # contact_distance = intersect.point - self.plane.position
+        contact = mf.subtract_arrays(intersect.point, self.plane.position)
+        concact = mf.norm(contact)
+
+        if contact <= self.radius: return None
+                
+        return Intersect(distance = intersect.distance, point = intersect.point, normal = self.plane.normal, texcoords = None, scene_obj = self)
+
 class AABB(object):
     # Axis Aligned Bounding Box
 
@@ -126,7 +146,7 @@ class AABB(object):
         ))
         self.planes.append(Plane( 
             mf.add(position, [-half_sizes[0], 0, 0]),
-            (1, 0, 0),
+            (-1, 0, 0),
             material
         ))
 
@@ -161,14 +181,14 @@ class AABB(object):
 
         for i in range(3):
             self.bounds_min[i] = self.position[i] - (epsilon + half_sizes[i])
-            self.bounds_max[i] = self.position[i] - (epsilon + half_sizes[i])
+            self.bounds_max[i] = self.position[i] + (epsilon + half_sizes[i])
 
     def ray_intersect(self, orig, dist):
         intersect = None
         t = float('inf')
 
         for plane in self.planes:
-            plane_inter = plane.ray_intersect([orig.x, orig.y, orig.z], dist)
+            plane_inter = plane.ray_intersect(orig, dist)
             if plane_inter is not None:
                 plane_point = plane_inter.point
 
@@ -180,6 +200,25 @@ class AABB(object):
                                 t = plane_inter.distance
                                 intersect = plane_inter
 
+                                # Tex corrds
+
+                                u, v = 0, 0
+
+                                # Las uvs de las caras de los lados
+                                if plane.normal[0] > 0:
+                                    # Mapear uvs para el eje x, usando las coordenadas de Y y Z
+                                    u = (plane_inter.point[1] - self.bounds_min[1]) / self.size[1]
+                                    v = (plane_inter.point[2] - self.bounds_min[2]) / self.size[2]
+
+                                elif abs(plane.normal[1] > 0):
+                                    # Mapear uvs para el eje y, usando las coordenadas de X y Z
+                                    u = (plane_inter.point[0] - self.bounds_min[0]) / self.size[0]
+                                    v = (plane_inter.point[2] - self.bounds_min[2]) / self.size[2]
+
+                                elif abs(plane.normal[1] > 0):
+                                    u = (plane_inter.point[0] - self.bounds_min[0]) / self.size[0]
+                                    v = (plane_inter.point[1] - self.bounds_min[1]) / self.size[1]
+
         if intersect is None: return None
 
         return Intersect(
@@ -189,3 +228,5 @@ class AABB(object):
                     texcoords=None,
                     scene_obj=self
                 )
+
+
