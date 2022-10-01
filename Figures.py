@@ -133,45 +133,18 @@ class AABB(object):
             size[1] / 2,
             size[2] / 2
         ]
-        # half_size_x = size[0] / 2
-        # half_size_y = size[1] / 2
-        # half_size_z = size[2] / 2
 
         # Sides
-        self.planes.append(Plane( 
-            mf.add(position, [half_sizes[0], 0, 0]),
-            (1, 0, 0),
-            material
-        ))
-        self.planes.append(Plane( 
-            mf.add(position, [-half_sizes[0], 0, 0]),
-            (-1, 0, 0),
-            material
-        ))
+        self.planes.append(Plane( mf.add(position, [half_sizes[0], 0, 0]), (1, 0, 0), material ))
+        self.planes.append(Plane( mf.add(position, [-half_sizes[0], 0, 0]), (-1, 0, 0), material ))
 
         # Up and Down
-        self.planes.append(Plane( 
-            mf.add(position, [0, half_sizes[1], 0]),
-            (0, 1, 0),
-            material
-        ))
-        self.planes.append(Plane( 
-            mf.add(position, [0, -half_sizes[1], 0]),
-            (0, -1, 0),
-            material
-        ))
+        self.planes.append(Plane( mf.add(position, [0, half_sizes[1], 0]), (0, 1, 0), material ))
+        self.planes.append(Plane( mf.add(position, [0, -half_sizes[1], 0]), (0, -1, 0), material ))
 
         # Front and back
-        self.planes.append(Plane( 
-            mf.add(position, [0, 0, half_sizes[2]]),
-            (0, 0, 1),
-            material
-        ))
-        self.planes.append(Plane( 
-            mf.add(position, [0, 0, -half_sizes[2]]),
-            (0, 0, -1),
-            material
-        ))
+        self.planes.append(Plane( mf.add(position, [0, 0, half_sizes[2]]), (0, 0, 1), material))
+        self.planes.append(Plane( mf.add(position, [0, 0, -half_sizes[2]]), (0, 0, -1), material))
 
         self.bounds_min = [0, 0, 0]
         self.bounds_max = [0, 0, 0]
@@ -200,7 +173,6 @@ class AABB(object):
                                 intersect = plane_inter
 
                                 # Tex corrds
-
                                 u, v = 0, 0
 
                                 # Las uvs de las caras de los lados
@@ -227,5 +199,3 @@ class AABB(object):
                     texcoords=None,
                     scene_obj=self
                 )
-
-
