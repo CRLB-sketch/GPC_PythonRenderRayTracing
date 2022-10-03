@@ -7,14 +7,14 @@ DIR_LIGHT = 0
 POINT_LIGHT = 1
 AMBIENT_LIGHT = 2
 
-def reflectVector(normal, direction):
+def reflect_vector(normal, direction):
     reflect = 2 * mf.dot(normal, direction)
     reflect = mf.multiply_matrix_by_a_value(normal, reflect)
     reflect = mf.subtract_arrays(reflect, direction)
     reflect = mf.divition(reflect, mf.norm(reflect))
     return reflect
 
-def refractVector(normal, direction, ior):
+def refract_vector(normal, direction, ior):
     # Snell's Law
     cosi = max(-1, min(1, mf.dot(direction, normal)))
     etai = 1
@@ -82,7 +82,7 @@ class DirectionalLight(object):
 
     def get_spec_color(self, intersect, raytracer):
         light_dir = mf.multiply_matrix_by_a_value(self.direction, -1)
-        reflect = reflectVector(intersect.normal, light_dir)
+        reflect = reflect_vector(intersect.normal, light_dir)
 
         view_dir = mf.subtract_V3(raytracer.cam_position, V3(intersect.point[0], intersect.point[1], intersect.point[2]))
         view_dir = mf.divition(view_dir, mf.norm(view_dir))
@@ -113,7 +113,7 @@ class PointLight(object):
         self.linear = linear
         self.quad = quad
         self.color = color
-        self.lightType = POINT_LIGHT
+        self.light_type = POINT_LIGHT
 
     def get_diffuse_color(self, intersect, raytracer):
         light_dir = mf.subtract_arrays(self.point, intersect.point)
@@ -138,7 +138,7 @@ class PointLight(object):
         light_dir = mf.subtract_arrays(self.point, intersect.point)
         light_dir = mf.divition(light_dir, mf.norm(light_dir))
 
-        reflect = reflectVector(intersect.normal, light_dir)
+        reflect = reflect_vector(intersect.normal, light_dir)
 
         view_dir = mf.subtract_V3(raytracer.cam_position, V3(intersect.point[0], intersect.point[1], intersect.point[2]))
         view_dir = mf.divition(view_dir, mf.norm(view_dir))

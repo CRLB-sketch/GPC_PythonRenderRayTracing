@@ -1,4 +1,3 @@
-from re import U
 from MathFake import MathFake as mf
 
 from math import atan2 as arctan2
@@ -146,6 +145,7 @@ class AABB(object):
         self.planes.append(Plane( mf.add(position, [0, 0, half_sizes[2]]), (0, 0, 1), material))
         self.planes.append(Plane( mf.add(position, [0, 0, -half_sizes[2]]), (0, 0, -1), material))
 
+        # Bounds
         self.bounds_min = [0, 0, 0]
         self.bounds_max = [0, 0, 0]
 
@@ -196,6 +196,6 @@ class AABB(object):
                     distance=t,
                     point= intersect.point,
                     normal= intersect.normal,
-                    texcoords=None,
+                    texcoords=(u, v),
                     scene_obj=self
                 )

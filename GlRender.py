@@ -25,7 +25,7 @@ from Lights import *
 from MathFake import MathFake as mf
 
 STEPS = 1
-MAX_RECURSION_DEPTH = 3
+MAX_RECURSION_DEPTH = 4
 
 V2 = namedtuple('Point2', ['x', 'y'])
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
@@ -114,9 +114,9 @@ class Raytracer(object):
     def cast_ray(self, origin, dir, scene_obj = None, recursion = 0) -> list:
         intersect = self.scene_intersect(origin, dir, scene_obj)
         
-        if intersect == None or recursion >= MAX_RECURSION_DEPTH:
-            return self.env_map.get_env_color(dir) if self.env_map else (self.clear_color[0] / 255, self.clear_color[1] / 255, self.clear_color[2] / 255)           
-        
+        if intersect == None or recursion >= MAX_RECURSION_DEPTH:            
+            return self.env_map.get_env_color(dir) if self.env_map else (self.clear_color[0] / 255, self.clear_color[1] / 255, self.clear_color[2] / 255)
+                
         material = intersect.scene_obj.material
         
         final_color = [0, 0, 0]
@@ -132,7 +132,7 @@ class Raytracer(object):
                 final_color = mf.add(final_color, light_color)
 
         elif material.mat_type == REFLECTIVE:
-            reflect = reflectVector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))
+            reflect = reflect_vector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))
             reflect_color = self.cast_ray(intersect.point, reflect, intersect.scene_obj, recursion + 1)
 
             spec_color = [0,0,0]
@@ -149,7 +149,7 @@ class Raytracer(object):
             for light in self.lights:
                 spec_color = mf.add(spec_color, light.get_spec_color(intersect, self))
 
-            reflect = reflectVector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))            
+            reflect = reflect_vector(intersect.normal, mf.multiply_matrix_by_a_value(dir, -1))            
             reflect_orig = mf.add(intersect.point, bias) if outside else mf.subtract_arrays(intersect.point, bias)            
             reflect_color = self.cast_ray(reflect_orig, reflect, None, recursion + 1)
             
@@ -157,7 +157,7 @@ class Raytracer(object):
             
             refract_color = [0, 0, 0]
             if kr < 1:
-                refract = refractVector(intersect.normal, dir, material.ior)
+                refract = refract_vector(intersect.normal, dir, material.ior)
                 refract_origin = mf.subtract_arrays(intersect.point, bias) if outside else mf.add(intersect.point, bias)            
                 refract_color = self.cast_ray(refract_origin, refract, None, recursion + 1)
                 
@@ -179,22 +179,21 @@ class Raytracer(object):
         return (r, g, b)
     
     def gl_render(self) -> None:
+        # Proyeccion
+        t = tan((self.fov * mf.pi() / 180) / 2) * self.near_plane
+        r = t * self.vp_width / self.vp_height
+            
         for y in range(self.vp_y, self.vp_y + self.vp_height + 1):
             for x in range(self.vp_x, self.vp_x + self.vp_width + 1):
                 # Pasar de coordenadas de ventana a coordenadas NDC (-1 a 1)
                 p_x = ((x + 0.5 - self.vp_x) / self.vp_width) * 2 - 1
                 p_y = ((y + 0.5 - self.vp_y) / self.vp_height) * 2 - 1
-                
-                # Proyeccion
-                t = tan((self.fov * mf.pi() / 180) / 2) * self.near_plane
-                r = t * self.vp_width / self.vp_height
-                
+                                                
                 p_x *= r
                 p_y *= t
                 
-                direction = V3(p_x, p_y, -self.near_plane)
-                temp_list_direction = [direction.x, direction.y, direction.z]
-                direction = mf.divition(temp_list_direction, mf.norm(temp_list_direction))
+                direction = V3(p_x, p_y, -self.near_plane)                
+                direction = mf.divition([direction.x, direction.y, direction.z], mf.norm([direction.x, direction.y, direction.z]))
                 
                 ray_color = self.cast_ray(self.cam_position, direction)
                 
