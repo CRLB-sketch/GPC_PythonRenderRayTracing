@@ -53,7 +53,7 @@ class Sphere(object):
         if t0 < 0:
             return None
         
-        # P = O + t0 * D
+        # P = O + t0 * D [or] P = O + D * t0
         P = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t0))
         normal = mf.subtract_V3(V3(P[0], P[1], P[2]), self.center)
         normal = mf.divition(normal, mf.norm(normal))        
@@ -63,11 +63,13 @@ class Sphere(object):
 
         uvs = (u, v)
 
-        return Intersect(distance = t0,
-                         point = P,
-                         normal = normal,
-                         texcoords = uvs,
-                         scene_obj = self)
+        return Intersect(
+            distance = t0,
+            point = P,
+            normal = normal,
+            texcoords = uvs,
+            scene_obj = self
+        )
 
 class Plane(object):
     def __init__(self, position, normal, material) -> None:
@@ -115,7 +117,13 @@ class Disk(object):
 
         if contact <= self.radius: return None
                 
-        return Intersect(distance = intersect.distance, point = intersect.point, normal = self.plane.normal, texcoords = None, scene_obj = self)
+        return Intersect(
+            distance = intersect.distance, 
+            point = intersect.point, 
+            normal = self.plane.normal, 
+            texcoords = None, 
+            scene_obj = self
+        )
 
 class AABB(object):
     # Axis Aligned Bounding Box
@@ -193,9 +201,38 @@ class AABB(object):
         if intersect is None: return None
 
         return Intersect(
-                    distance=t,
-                    point= intersect.point,
-                    normal= intersect.normal,
-                    texcoords=(u, v),
-                    scene_obj=self
-                )
+            distance=t,
+            point= intersect.point,
+            normal= intersect.normal,
+            texcoords=(u, v),
+            scene_obj=self
+        )
+
+class Torus(object):
+
+    def __init__(self, position, radius_minus, radius_major, material) -> None:
+        self.position = position
+        self.radius_minus = radius_minus # r
+        self.radius_major = radius_major # R
+
+        self.material = material
+
+    def ray_intersect(self, origin, dir):
+        # representar el circulo = (radius_major - radius_minus) / 2
+        # retornar la t más cercana del torus
+        t0 = 0
+        
+        # r(t) = o + d * t # Punto de contacto
+        p = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t0))
+
+        # F(r(t)) = 0, t > 0
+        
+
+        # rx = ox + dx * t
+
+        # ry = oy + dy * t
+
+        # rz = oz + dz * t
+
+
+        return None
