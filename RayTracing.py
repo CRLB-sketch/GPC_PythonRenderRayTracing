@@ -24,17 +24,18 @@ rtx.env_map = Texture("textures/parkingLot.bmp")
 rtx.lights.append( AmbientLight(intensity= 0.1))
 rtx.lights.append( PointLight( point = (-1, -1, 0) ))
 
-# Paredes
-rtx.scene.append( Plane(position=(0, -10, 0), normal=(0, 1, 0), material=wall))
-rtx.scene.append( Plane(position=(0, 10, 0), normal=(0, -1, 0), material=brick))
-rtx.scene.append( Plane(position=(-10, 0, 0), normal=(1, 0, 0), material=brick))
-rtx.scene.append( Plane(position=(10, 0, 0), normal=(-1, 0, 0), material=brick))
-rtx.scene.append( Plane(position=(0, 0, -50), normal=(0, 0, 1), material=brick))
+# # Paredes
+# rtx.scene.append( Plane(position=(0, -10, 0), normal=(0, 1, 0), material=wall))
+# rtx.scene.append( Plane(position=(0, 10, 0), normal=(0, -1, 0), material=brick))
+# rtx.scene.append( Plane(position=(-10, 0, 0), normal=(1, 0, 0), material=brick))
+# rtx.scene.append( Plane(position=(10, 0, 0), normal=(-1, 0, 0), material=brick))
+# rtx.scene.append( Plane(position=(0, 0, -50), normal=(0, 0, 1), material=brick))
 
-# Cuadros
-rtx.scene.append( AABB(position=(2, -2, -10), size=(2, 2, 2), material= mirror))
+# # Cuadros
+# rtx.scene.append( AABB(position=(2, -2, -10), size=(2, 2, 2), material= mirror))
+
 rtx.scene.append( AABB(position=(-2, -2, -10), size=(2, 2, 2), material= baby_blue))
 
 rtx.gl_render()
 
-rtx.gl_finish("outputs/output_rt3_duh_2.bmp")
+rtx.gl_finish("outputs/output_lab_3.bmp")

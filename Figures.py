@@ -208,31 +208,48 @@ class AABB(object):
             scene_obj=self
         )
 
+class Triangle(object):
+
+    def __init__(self) -> None:
+        pass
+
+    def ray_intersect(self, origin, dir):
+        return None        
+
 class Torus(object):
 
     def __init__(self, position, radius_minus, radius_major, material) -> None:
         self.position = position
-        self.radius_minus = radius_minus # r
-        self.radius_major = radius_major # R
+        self.radius_minus = radius_minus # r # B
+        self.radius_major = radius_major # R # A
 
         self.material = material
 
     def ray_intersect(self, origin, dir):
         # representar el circulo = (radius_major - radius_minus) / 2
         # retornar la t más cercana del torus
-        t0 = 0
+        # t0 = 0
+
+        # Polinomio a la cuarta
         
         # r(t) = o + d * t # Punto de contacto
-        p = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t0))
-
-        # F(r(t)) = 0, t > 0
-        
-
+        # p = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t0))
+        # F(r(t)) = 0, t > 0        
         # rx = ox + dx * t
-
         # ry = oy + dy * t
-
         # rz = oz + dz * t
+        # ! ==================================================
 
+        sum_sqrd = dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]
+        e = origin[0] * origin[0] + origin[1] * origin[1] + origin[0] * origin[0] - self.radius_major * self.radius_major - self.radius_minus * self.radius_minus
+        f = origin[0] * dir[0] + origin[1] * dir[1] + origin[2] * dir[2]
+        four_a_sqrd = 4.0 * self.radius_major * self.radius_major
+
+        coeffs = [0, 0, 0, 0, 0]
+        coeffs[0] = e * e - four_a_sqrd * (self.radius_minus * self.radius_minus - origin[1] * origin[1])
+        coeffs[1] = 4.0 * f * e + 2.0 * four_a_sqrd * origin[1] * dir[1]
+        coeffs[2] = 2.0 * sum_sqrd * e + 4.0 * f * f + four_a_sqrd * dir[1] * dir[1]
+        coeffs[3] = 4.0 * sum_sqrd * f
+        coeffs[4] = sum_sqrd * sum_sqrd
 
         return None
