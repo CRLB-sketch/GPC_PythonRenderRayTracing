@@ -184,3 +184,4 @@ class AmbientLight(object):
     
     def get_shadow_intensity(self, intersect, raytracer):
         return 0
+    

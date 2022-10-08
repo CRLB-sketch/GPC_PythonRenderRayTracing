@@ -8,9 +8,9 @@ __author__ = "Cristian Laynez 201281"
 __status__ = "Student of Computer Science"
 
 # ! Math Fake : Clase/Libreria donde estarán las funciones matemáticas y de AL
+# TODO: La clase matemática más MotherF*cker que vas a conocer >:)
 ######################################################################################
 
-from array import array
 from collections import namedtuple
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
 V4 = namedtuple('Point4', ['x', 'y', 'z', 'w'])
@@ -40,7 +40,6 @@ class MathFake:
     """
     @staticmethod
     def multiply_two_lists_or_arrays(array1 : list, array2 : list):
-        # if len(array1) != len(array2): return None
         return [(array1[i] * array2[i]) for i in range(len(array1))]
     
     """ 
@@ -101,18 +100,43 @@ class MathFake:
         
         return result
     
+    """
+    Multiplicar entre matriz 3 x 3 y matriz 3 x 1:
+        Se llevará a cabo una multiplicacion entre estas matrices en especial :)
+    Params:
+        matrix_a : Matriz 3 x 3
+        list_b : Matriz 3 x 1
+    Returns:
+        list : La matriz ya multiplicada
+    """
     @staticmethod
     def multiply_m3x3_and_m3x1(matrix_a : list, list_b : list) -> list:
         return [(matrix_a[i][0] * list_b[0]) + (matrix_a[i][1] * list_b[1]) + (matrix_a[i][2] * list_b[2]) for i in range(len(matrix_a))]
     
+    """
+    Multiplicar una matriz por un valor:
+        Se recibirá una lista para multiplicar dicho valor
+    Params:
+        matrix_or_list : Realmente es una lista jaja
+        the_value : Valor a multiplicar con la matriz
+    Returns:
+        list : Resultado de la multiplicación correspondiente
+    """
     @staticmethod
-    def multiply_matrix_by_a_value(matrix_or_list : list, the_value : float):
+    def multiply_matrix_by_a_value(matrix_or_list : list, the_value : float) -> list:
         return [(i * the_value) for i in matrix_or_list]
     
+    """
+    Add / Sumar:
+        Sumar dos listas/arreglos del mismo tamaño
+    Params:
+        m_list1 & m_list2 : Recibir una lista o array con números
+    Returns:
+        list: Una lista con el resultado de la suma
+    """
     @staticmethod
-    def add(matrix_list1 : list, matrix_list2 : list):
-        # if len(matrix_list1) != len(matrix_list2): return None                
-        return [(matrix_list1[i] + matrix_list2[i]) for i in range(len(matrix_list1))]
+    def add(m_list1 : list, m_list2 : list) -> list:
+        return [(m_list1[i] + m_list2[i]) for i in range(len(m_list1))]
 
     """
     Valores inversos para un array o lista:
@@ -254,3 +278,12 @@ class MathFake:
     """
     @staticmethod
     def pi() -> float: return 3.14159265358979323
+    
+    """
+    Epsilon:
+        Número de Epsilon más aproximado
+    Return:
+        float : Valor Epsilon
+    """    
+    @staticmethod
+    def epsilon() -> float: return 0.001

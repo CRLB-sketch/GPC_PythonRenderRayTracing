@@ -1,7 +1,10 @@
 from GlRender import *
 
+from test import *
+
 from Figures import *
 from Lights import *
+from outputs.test import testing_func
 
 width = 512
 height = 512
@@ -24,17 +27,8 @@ rtx.env_map = Texture("textures/parkingLot.bmp")
 rtx.lights.append( AmbientLight(intensity= 0.1))
 rtx.lights.append( PointLight( point = (-1, -1, 0) ))
 
-# # Paredes
-# rtx.scene.append( Plane(position=(0, -10, 0), normal=(0, 1, 0), material=wall))
-# rtx.scene.append( Plane(position=(0, 10, 0), normal=(0, -1, 0), material=brick))
-# rtx.scene.append( Plane(position=(-10, 0, 0), normal=(1, 0, 0), material=brick))
-# rtx.scene.append( Plane(position=(10, 0, 0), normal=(-1, 0, 0), material=brick))
-# rtx.scene.append( Plane(position=(0, 0, -50), normal=(0, 0, 1), material=brick))
-
-# # Cuadros
-# rtx.scene.append( AABB(position=(2, -2, -10), size=(2, 2, 2), material= mirror))
-
-rtx.scene.append( AABB(position=(-2, -2, -10), size=(2, 2, 2), material= baby_blue))
+# Triangulos
+rtx.scene.append ( Triangle(A = V3(1, 0, 0), B = V3(1, -1, 0), C = V3(0, 0, -1), material = baby_blue))
 
 rtx.gl_render()
 

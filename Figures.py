@@ -157,11 +157,9 @@ class AABB(object):
         self.bounds_min = [0, 0, 0]
         self.bounds_max = [0, 0, 0]
 
-        epsilon = 0.001
-
         for i in range(3):
-            self.bounds_min[i] = self.position[i] - (epsilon + half_sizes[i])
-            self.bounds_max[i] = self.position[i] + (epsilon + half_sizes[i])
+            self.bounds_min[i] = self.position[i] - (mf.epsilon() + half_sizes[i])
+            self.bounds_max[i] = self.position[i] + (mf.epsilon() + half_sizes[i])
 
     def ray_intersect(self, orig, dist):
         intersect = None
@@ -210,11 +208,52 @@ class AABB(object):
 
 class Triangle(object):
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, A : V3, B: V3, C : V3, material) -> None:
+        self.v0 = A
+        self.v1 = B
+        self.v2 = C        
+        self.material = material
 
-    def ray_intersect(self, origin, dir):
-        return None        
+    def ray_intersect(self, origin : list, dir : list):
+        # Encontrar t y p
+        v0v1 = mf.subtract_V3(self.v1, self.v0)
+        v0v2 = mf.subtract_V3(self.v2, self.v0)
+        
+        normal = mf.cross(v0v1, v0v2)        
+        contact = mf.dot(normal, dir)
+        
+        if contact < mf.epsilon() : return None
+        
+        d = -(mf.dot(normal, [self.v0.x, self.v0.y, self.v0.z]))        
+        t = -(mf.dot(normal, origin) + d) / contact
+        
+        if(t < 0): return None
+            
+        # P = O + t * D
+        P = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t))
+                    
+        # borde 0
+        edge_0 = mf.subtract_V3(self.v1, self.v0)
+        vp0 = mf.subtract_arrays(P, [self.v0.x, self.v0.y, self.v0.z])        
+        
+        # borde 1
+        edge_1 = mf.subtract_V3(self.v2, self.v1)
+        vp1 = mf.subtract_arrays(P, [self.v1.x, self.v1.y, self.v1.z])        
+        
+        # borde 2
+        edge_2 = mf.subtract_V3(self.v0, self.v2)
+        vp2 = mf.subtract_arrays(P, [self.v2.x, self.v2.y, self.v2.z])        
+        
+        if mf.dot(normal, mf.cross(edge_0, vp0)) > 0 and mf.dot(normal, mf.cross(edge_1, vp1)) > 0 and mf.dot(normal, mf.cross(edge_2, vp2)) > 0:                            
+            return Intersect(
+                distance = t,
+                point = P,
+                normal = normal,
+                texcoords = None,
+                scene_obj = self
+            )
+        
+        return None
 
 class Torus(object):
 
@@ -238,18 +277,5 @@ class Torus(object):
         # rx = ox + dx * t
         # ry = oy + dy * t
         # rz = oz + dz * t
-        # ! ==================================================
-
-        sum_sqrd = dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]
-        e = origin[0] * origin[0] + origin[1] * origin[1] + origin[0] * origin[0] - self.radius_major * self.radius_major - self.radius_minus * self.radius_minus
-        f = origin[0] * dir[0] + origin[1] * dir[1] + origin[2] * dir[2]
-        four_a_sqrd = 4.0 * self.radius_major * self.radius_major
-
-        coeffs = [0, 0, 0, 0, 0]
-        coeffs[0] = e * e - four_a_sqrd * (self.radius_minus * self.radius_minus - origin[1] * origin[1])
-        coeffs[1] = 4.0 * f * e + 2.0 * four_a_sqrd * origin[1] * dir[1]
-        coeffs[2] = 2.0 * sum_sqrd * e + 4.0 * f * f + four_a_sqrd * dir[1] * dir[1]
-        coeffs[3] = 4.0 * sum_sqrd * f
-        coeffs[4] = sum_sqrd * sum_sqrd
 
         return None
