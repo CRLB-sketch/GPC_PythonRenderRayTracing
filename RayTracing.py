@@ -1,10 +1,7 @@
 from GlRender import *
 
-from test import *
-
 from Figures import *
 from Lights import *
-from outputs.test import testing_func
 
 width = 512
 height = 512
@@ -20,15 +17,19 @@ baby_blue = Material(diffuse=(0, 0, 1), spec = 64, mat_type=OPAQUE)
 
 rtx = Raytracer(width, height)
 
-# ! - Escenario Cuarto Chilero
-
-rtx.env_map = Texture("textures/parkingLot.bmp")
+rtx.env_map = Texture("textures/landscape.bmp")
 
 rtx.lights.append( AmbientLight(intensity= 0.1))
 rtx.lights.append( PointLight( point = (-1, -1, 0) ))
 
-# Triangulos
-rtx.scene.append ( Triangle(A = V3(1, 0, 0), B = V3(1, -1, 0), C = V3(0, 0, -1), material = baby_blue))
+# Primer Triangulo
+rtx.scene.append(Triangle(A = V3(-1.9, -1.5, -3.5), B = V3(0, -1.5, -3.5), C = V3(-0.95, 0, -3.5), material = baby_blue))
+
+# Segundo Triangulo
+rtx.scene.append(Triangle(A = V3(0, -1.5, -3.5), B = V3(1.9, -1.5, -3.5), C = V3(0.95, 0, -3.5), material = marble))
+
+# Tercer Triangulo
+rtx.scene.append(Triangle(A = V3(-0.95, 0, -3.5), B = V3(0.95, 0, -3.5), C = V3(0, 1.5, -3.5), material = mirror))
 
 rtx.gl_render()
 

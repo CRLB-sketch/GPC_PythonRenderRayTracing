@@ -216,40 +216,39 @@ class Triangle(object):
 
     def ray_intersect(self, origin : list, dir : list):
         # Encontrar t y p
-        v0v1 = mf.subtract_V3(self.v1, self.v0)
+        v0v1 = mf.subtract_V3(self.v1, self.v0)        
         v0v2 = mf.subtract_V3(self.v2, self.v0)
         
         normal = mf.cross(v0v1, v0v2)        
-        contact = mf.dot(normal, dir)
         
-        if contact < mf.epsilon() : return None
+        position = [
+            (self.v0.x + self.v1.x + self.v2.x) / 3,
+            (self.v0.y + self.v1.y + self.v2.y) / 3,
+            (self.v0.z + self.v1.z + self.v2.z) / 3,
+        ]
         
-        d = -(mf.dot(normal, [self.v0.x, self.v0.y, self.v0.z]))        
-        t = -(mf.dot(normal, origin) + d) / contact
+        plane = Plane(position, normal, self.material)
         
-        if(t < 0): return None
+        intersect = plane.ray_intersect(origin, dir)
+        
+        if intersect == None: return None        
+         
+        u, v, w = 0 , 0 , 0
+                        
+        edge_0 = (self.v1.y - self.v2.y) * (intersect.point[0] - self.v2.x) + (self.v2.x - self.v1.x) * (intersect.point[1] - self.v2.y)
+        edge_1 = (self.v2.y - self.v0.y) * (intersect.point[0] - self.v2.x) + (self.v0.x - self.v2.x) * (intersect.point[1] - self.v2.y)
+        edge_2 = (self.v1.y - self.v2.y) * (self.v0.x - self.v2.x) + (self.v2.x - self.v1.x) * (self.v0.y - self.v2.y)
             
-        # P = O + t * D
-        P = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t))
-                    
-        # borde 0
-        edge_0 = mf.subtract_V3(self.v1, self.v0)
-        vp0 = mf.subtract_arrays(P, [self.v0.x, self.v0.y, self.v0.z])        
-        
-        # borde 1
-        edge_1 = mf.subtract_V3(self.v2, self.v1)
-        vp1 = mf.subtract_arrays(P, [self.v1.x, self.v1.y, self.v1.z])        
-        
-        # borde 2
-        edge_2 = mf.subtract_V3(self.v0, self.v2)
-        vp2 = mf.subtract_arrays(P, [self.v2.x, self.v2.y, self.v2.z])        
-        
-        if mf.dot(normal, mf.cross(edge_0, vp0)) > 0 and mf.dot(normal, mf.cross(edge_1, vp1)) > 0 and mf.dot(normal, mf.cross(edge_2, vp2)) > 0:                            
+        u = edge_0 / edge_2
+        v = edge_1 / edge_2
+        w = 1 - u - v
+                
+        if 0 <= u and 0 <= v and 0 <= w:
             return Intersect(
-                distance = t,
-                point = P,
+                distance = intersect.distance,
+                point = intersect.point,
                 normal = normal,
-                texcoords = None,
+                texcoords = (u, v),
                 scene_obj = self
             )
         
