@@ -15,6 +15,16 @@ from collections import namedtuple
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
 V4 = namedtuple('Point4', ['x', 'y', 'z', 'w'])
 
+from math import sqrt
+from math import acos as arccos
+from math import cos
+from math import atan2 as arctan2
+
+import decimal
+decimal.getcontext().prec = 100
+
+# * -------------------------------------------------------------------------------------
+# * CLASE MOTHERF*UCKER de MathFaKe -----------------------------------------------------
 class MathFake:
                   
     """ 
@@ -269,7 +279,7 @@ class MathFake:
                     matrix[z][j] -= factor * matrix[i][j]
                 
         return [[matrix[i][j] for j in range(size, len(matrix[0]))] for i in range(size)]
-    
+            
     """
     Pi:
         Número de Pi más aproximado
@@ -280,10 +290,166 @@ class MathFake:
     def pi() -> float: return 3.14159265358979323
     
     """
-    Epsilon:
-        Número de Epsilon más aproximado
+    Epsilon: Número de Epsilon más aproximado
+    
     Return:
         float : Valor Epsilon
     """    
     @staticmethod
     def epsilon() -> float: return 0.001
+    
+    """
+    Epsilon: Número de Epsilon más aproximado
+    
+    Return:
+        float : Valor Epsilon
+    """    
+    @staticmethod
+    def k_epsilon() -> float: return 0.0001
+    
+    """
+    Sqrt: Raíz al cuadrado
+    
+    Return:
+        float : Valor raíz al cuadrado del número ingresado
+    """
+    def mf_sqrt(number : float) -> float: 
+        # number = round(number, 20)
+        # return number ** 2
+        return sqrt(number)
+    
+    """
+    cbrt:
+        Raíz Cubica
+    Return:
+        float : Valor raíz cubica del número ingresado
+    """
+    def cbrt(number : float) -> float: 
+        if number < 0:
+            number = abs(number)
+            return number ** (1 / 3) * (-1)
+        return number ** (1 / 3)
+    
+# * -------------------------------------------------------------------------------------
+# * FUNCIONES AUXILIARES MOTHERF*UCKERS de MathFaKe -------------------------------------
+# Referencias: http://blog.marcinchwedczuk.pl/ray-tracing-torus
+
+def epsilon_surrounding(number):
+    eps = 1e-9
+    return ((number) > -eps and (number) < eps)
+
+def solve_eq_2(numbers : list) -> list: 
+    # x^2 + px + q = 0
+    p = numbers[1] / (2 * numbers[2])
+    q = numbers[0] / numbers[2]
+    D = p * p - q
+    
+    if epsilon_surrounding(D): return [-p]
+    
+    if D < 0: return []
+    
+    sqrt_d = MathFake.mf_sqrt(D)
+    return [sqrt_d - p, -sqrt_d - p]
+
+def solve_eq_3(numbers : list) -> list: 
+    # x^3 + Ax^2 + Bx + C = 0
+    A = numbers[2] / numbers[3];
+    B = numbers[1] / numbers[3];
+    C = numbers[0] / numbers[3];
+    
+    sqrd_a = A * A
+    p = 1.0 / 3 * (- 1.0 / 3 * sqrd_a + B)
+    q = 1.0 / 2 * (2.0 / 27 * A * sqrd_a - 1.0 / 3 * A * B + C)
+    
+    cb_p = p * p * p
+    D = q * q + cb_p
+    
+    solved = None
+    
+    if epsilon_surrounding(D):
+        if q == 0:
+            solved = [0]
+        else:
+            u = MathFake.cbrt(-q)
+            # print("ESTO PASO 1") # Error aquí
+            solved = [2 * u, -u]
+            
+    elif D < 0:
+        phi = 1.0 / 3 * arccos(-q / MathFake.mf_sqrt(-cb_p))
+        t = 2 * MathFake.mf_sqrt(-p)
+        
+        # print("ESTO PASO 2")
+        solved = [
+            t * cos(phi),
+            -t * cos(phi + MathFake.pi() / 3),
+            -t * cos(phi - MathFake.pi() / 3),
+        ]
+    
+    else:
+        sqrt_d = MathFake.mf_sqrt(D)
+        u = MathFake.cbrt(sqrt_d - q)
+        v = - MathFake.cbrt(sqrt_d + q)
+        
+        # solved = u + v
+        # print("ESTO PASO 3")
+        solved = [u + v]
+    
+    return [(solved[i] - (1.0 / 4 * A)) for i in range(0, len(solved))]
+
+def solve_eq_4(numbers : list) -> list: 
+    #  x^4 + Ax^3 + Bx^2 + Cx + D = 0        
+    A = numbers[3] / numbers[4]
+    B = numbers[2] / numbers[4]
+    C = numbers[1] / numbers[4]
+    D = numbers[0] / numbers[4]
+    
+    sqrd_a = A * A
+    p = - 3.0 / 8 * sqrd_a + B
+    q = 1.0 / 8 * sqrd_a * A - 1.0 / 2 * A * B + C
+    r = - 3.0 / 256 * sqrd_a * sqrd_a + 1.0 / 16 * sqrd_a * B - 1.0 / 4 * A * C + D
+        
+    # Verificar si hay un termino absoluto
+    if epsilon_surrounding(r):
+        solved = solve_eq_3([q, p, 0, 1])
+        solved.append(0)
+        return [(solved[i] - (1.0 / 4 * A)) for i in range(0, len(solved))]
+        
+    # Resolver la ecuacion cubica
+    coeffs = [
+        1.0 / 2 * r * p - 1.0 / 8 * q * q,
+        - r,
+        - 1.0 / 2 * p,
+        1
+    ]
+    
+    solved = solve_eq_3(coeffs)
+    
+    real_sol = solved[0] # z
+    
+    u = real_sol * real_sol - r
+    v = 2 * real_sol - p
+    
+    u = u**2 if u > 0 else 0
+    v = v**2 if v > 0 else 0
+    
+    coeffs = [
+        real_sol - u,
+        -v if q < 0 else v,
+        1
+    ]
+    
+    solved = solve_eq_2(coeffs)
+    
+    coeffs = [
+        real_sol + u,
+        v if q < 0 else -v,
+        1
+    ]
+    
+    # Se concatena
+    # s = s.concat(solve2(coeffs));
+    solved_eq2 = solve_eq_2(coeffs)
+    for x in solved_eq2:
+        solved.append(x)
+    
+    return [(solved[i] - (1.0 / 4 * A)) for i in range(0, len(solved))]

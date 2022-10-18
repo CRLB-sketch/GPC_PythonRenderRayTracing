@@ -1,10 +1,10 @@
 from MathFake import MathFake as mf
-
-from math import atan2 as arctan2
-from math import acos as arccos
+from MathFake import *
 
 from collections import namedtuple
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
+
+
 
 WHITE = (1, 1, 1)
 BLACK = (0, 0, 0)
@@ -61,13 +61,11 @@ class Sphere(object):
         u = 1 - ((arctan2(normal[2], normal[0]) / (2 * mf.pi())) + 0.5)
         v = arccos(-normal[1]) / mf.pi()
 
-        uvs = (u, v)
-
         return Intersect(
             distance = t0,
             point = P,
             normal = normal,
-            texcoords = uvs,
+            texcoords = (u, v),
             scene_obj = self
         )
 
@@ -243,38 +241,76 @@ class Triangle(object):
         v = edge_1 / edge_2
         w = 1 - u - v
                 
-        if 0 <= u and 0 <= v and 0 <= w:
+        if u >= 0 and v >= 0 and w >= 0:
             return Intersect(
                 distance = intersect.distance,
                 point = intersect.point,
                 normal = normal,
-                texcoords = (u, v),
+                texcoords = (u, v, w),
                 scene_obj = self
             )
         
         return None
 
+# Referencias: http://blog.marcinchwedczuk.pl/ray-tracing-torus
 class Torus(object):
 
-    def __init__(self, position, radius_minus, radius_major, material) -> None:
+    def __init__(self, position : list, radius_minus : float, radius_major : float, material) -> None:
         self.position = position
-        self.radius_minus = radius_minus # r # B
-        self.radius_major = radius_major # R # A
-
+        self.radius_minus = radius_minus # r # B # tube Radius
+        self.radius_major = radius_major # R # A # swept radius
         self.material = material
 
     def ray_intersect(self, origin, dir):
-        # representar el circulo = (radius_major - radius_minus) / 2
-        # retornar la t más cercana del torus
-        # t0 = 0
-
-        # Polinomio a la cuarta
+        # !-------------------------------------------------------------------
+        ox = origin[0]
+        oy = origin[1]
+        oz = origin[2]
         
-        # r(t) = o + d * t # Punto de contacto
-        # p = mf.add(origin, mf.multiply_matrix_by_a_value(dir, t0))
-        # F(r(t)) = 0, t > 0        
-        # rx = ox + dx * t
-        # ry = oy + dy * t
-        # rz = oz + dz * t
+        dx = dir[0]
+        dy = dir[1]
+        dz = dir[2]
+        
+        # Definir coeficientes para la ecuacion cuadratica
+        sum_d = dx * dx + dy * dy + dz * dz
+        e = ox * ox + oy * oy + oz * oz - self.radius_major * self.radius_major - self.radius_minus * self.radius_minus
+        f = ox * dx + oy * dy + oz * dz
+        four_sqrd = 4.0 * self.radius_major * self.radius_major
+        
+        coeffs = [
+            e * e - four_sqrd * (self.radius_minus * self.radius_minus - oy * oy),
+            4.0 * f * e + 2.0 * four_sqrd * oy * dy,
+            2.0 * sum_d * e + 4.0 * f * f + four_sqrd * dy * dy,
+            4.0 * sum_d * f,
+            sum_d * sum_d
+        ]
+        
+        sol_torus = solve_eq_4(coeffs)
+        
+        if sol_torus == None: return None
+        
+        t = float('inf')
+        for x in sol_torus:
+            if (x > mf.k_epsilon()) and (x < t):
+                t = x
+        
+        # Obtener Punto
+        point = V3(ox + dx * t, oy + dy * t, oz + dz * t)
+        param_squared = self.radius_major * self.radius_major + self.radius_minus * self.radius_minus
+        sum_squared = point.x * point.x + point.y * point.y + point.z * point.z
+        
+        normal = [
+            4.0 * point.x * (sum_squared - param_squared),
+            4.0 * point.y * (sum_squared - param_squared + 2.0 * self.radius_major * self.radius_major),
+            4.0 * point.z * (sum_squared - param_squared)
+        ]        
+        
+        return Intersect(
+            distance = t,
+            point = [point.x, point.y, point.z],
+            normal = normal,
+            texcoords = None,
+            scene_obj = self
+        )
 
-        return None
+        # return None
