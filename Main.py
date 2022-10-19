@@ -32,8 +32,19 @@ rtx.lights.append( PointLight( point = (-1, -1, 0) ))
 
 # ! PREPARAR ESCENA PARA PROYECTO 2 ------------------------------------
 
-rtx.scene.append( Disk(position = (0,-3,-7), radius = 2, normal = (0,1,0), material = baby_blue ) )
-# rtx.scene.append( Disk(position=(0, 2, 0), normal = (0, 1,0 ), material = brick, radius = 3))
+rtx.scene.append( Disk(position = (0,-2,-7), radius = 3, normal = (0,1,0), material = baby_blue ) )
+
+# # ! TESTING:
+# rtx.scene.append( Plane(position = (0,-10,0), normal = (0,1,0), material = brick ))
+# rtx.scene.append( Plane(position = (0,10,0), normal = (0,-1,0), material = brick ))
+# rtx.scene.append( Plane(position = (-10,0,0), normal = (1,0,0), material = stone ))
+# rtx.scene.append( Plane(position = (10,0,0), normal = (-1,0,0), material = stone ))
+# rtx.scene.append( Plane(position = (0,0,-40), normal = (0,0,1), material = stone ))
+
+# rtx.scene.append( Disk(position = (0,-3,-7), radius = 2, normal = (0,1,0), material = mirror ))
+
+# rtx.scene.append( AABB(position = (-2,1,-10), size = (2,2,2), material = glass))
+# rtx.scene.append( AABB(position = (2,1,-10), size = (2,2,2), material = marble))
 
 rtx.gl_render()
 
