@@ -4,8 +4,6 @@ from MathFake import *
 from collections import namedtuple
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
 
-
-
 WHITE = (1, 1, 1)
 BLACK = (0, 0, 0)
 

@@ -23,8 +23,6 @@ from math import atan2 as arctan2
 import decimal
 decimal.getcontext().prec = 100
 
-# * -------------------------------------------------------------------------------------
-# * CLASE MOTHERF*UCKER de MathFaKe -----------------------------------------------------
 class MathFake:
                   
     """ 
