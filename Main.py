@@ -22,29 +22,17 @@ rtx.env_map = Texture("textures/stars_landscape.bmp")
 rtx.lights.append( AmbientLight(intensity= 0.1))
 rtx.lights.append( PointLight( point = (-1, -1, 0) ))
 
-# ! INTENTO TORUS ------------------------------------------------------
-# Prueba Torus
-# rtx.scene.append( Torus([0, 0, 0], 0.5, 0.6, baby_blue))
-# rtx.scene.append( Torus([0, 0, 0], 0.5, 0.4, baby_blue)) # NEL
-# rtx.scene.append( Torus([0, 0, 0], 0.4, 0.5, baby_blue)) # Solo bordes
-# rtx.scene.append( Torus([0, 0, 0], 0.4, 0.4, baby_blue))
-# rtx.scene.append( Torus([0, 0, 0], 0.1, 0.2, baby_blue))
-
 # ! PREPARAR ESCENA PARA PROYECTO 2 ------------------------------------
 
-rtx.scene.append( Disk(position = (0,-2,-7), radius = 3, normal = (0,1,0), material = baby_blue ) )
+rtx.scene.append( Plane(position = (0,-10,0), normal = (0,1,0), material = brick ))
 
-# # ! TESTING:
-# rtx.scene.append( Plane(position = (0,-10,0), normal = (0,1,0), material = brick ))
-# rtx.scene.append( Plane(position = (0,10,0), normal = (0,-1,0), material = brick ))
-# rtx.scene.append( Plane(position = (-10,0,0), normal = (1,0,0), material = stone ))
-# rtx.scene.append( Plane(position = (10,0,0), normal = (-1,0,0), material = stone ))
-# rtx.scene.append( Plane(position = (0,0,-40), normal = (0,0,1), material = stone ))
+rtx.scene.append( AABB(position = (0, 0.5, -12.5), size = (15, 6, 2), material = brick)) # Pared de fondo
 
-# rtx.scene.append( Disk(position = (0,-3,-7), radius = 2, normal = (0,1,0), material = mirror ))
+rtx.scene.append( AABB(position = (0, -3, -11), size = (15, 0.3, 5), material = baby_blue))
+rtx.scene.append( AABB(position = (0, -2.5, -10), size = (15, 0.3, 2), material = baby_blue))
 
-# rtx.scene.append( AABB(position = (-2,1,-10), size = (2,2,2), material = glass))
-# rtx.scene.append( AABB(position = (2,1,-10), size = (2,2,2), material = marble))
+rtx.scene.append( AABB(position = (5,0,-10), size = (2,6.5,6), material = brick)) # Pared derecho
+rtx.scene.append( AABB(position = (-5,0,-10), size = (2,6.5,6), material = brick)) # Pared izquierdo
 
 rtx.gl_render()
 
